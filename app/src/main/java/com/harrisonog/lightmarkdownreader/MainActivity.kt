@@ -56,6 +56,9 @@ class MainActivity : ComponentActivity() {
                     },
                     onShare = {
                         shareCurrentFile()
+                    },
+                    onClose = {
+                        viewModel.closeFile()
                     }
                 )
             }

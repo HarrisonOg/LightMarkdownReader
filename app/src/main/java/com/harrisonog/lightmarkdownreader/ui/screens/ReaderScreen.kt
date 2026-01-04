@@ -28,7 +28,8 @@ import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
 fun ReaderScreen(
     viewModel: ReaderViewModel = viewModel(),
     onPickFile: () -> Unit,
-    onShare: () -> Unit = {}
+    onShare: () -> Unit = {},
+    onClose: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -39,6 +40,9 @@ fun ReaderScreen(
                 onOpenFile = onPickFile,
                 onShare = if (uiState is ReaderUiState.Success) {
                     onShare
+                } else null,
+                onClose = if (uiState is ReaderUiState.Success) {
+                    onClose
                 } else null
             )
         }

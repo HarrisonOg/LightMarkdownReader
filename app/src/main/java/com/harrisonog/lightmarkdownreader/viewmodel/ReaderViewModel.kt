@@ -43,6 +43,10 @@ class ReaderViewModel : ViewModel() {
             )
         }
     }
+
+    fun closeFile() {
+        _uiState.value = ReaderUiState.Empty
+    }
 }
 
 sealed class ReaderUiState {

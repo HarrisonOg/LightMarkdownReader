@@ -3,6 +3,7 @@
     <string name="markdown_reader">Markdown Reader</string>
     <string name="open_file">Open file</string>
     <string name="share">Share</string>
+    <string name="close">Close</string>
     <string name="no_file_opened">No file opened</string>
     <string name="open_markdown_file">Open Markdown File</string>
     <string name="error_format">Error: %s</string>
