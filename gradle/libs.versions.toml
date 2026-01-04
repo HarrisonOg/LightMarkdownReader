@@ -9,6 +9,9 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2024.09.00"
 markwon = "4.6.2"
+mockk = "1.13.8"
+coroutinesTest = "1.7.3"
+turbine = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +33,10 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
 markwon-syntax-highlight = { group = "io.noties.markwon", name = "syntax-highlight", version.ref = "markwon" }
 prism4j = { group = "io.noties", name = "prism4j", version = "2.0.0" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
