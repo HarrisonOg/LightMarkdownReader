@@ -1,11 +1,24 @@
 package com.harrisonog.lightmarkdownreader.ui.screens
 
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -14,12 +27,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harrisonog.lightmarkdownreader.R
+import com.harrisonog.lightmarkdownreader.data.RecentFile
 import com.harrisonog.lightmarkdownreader.ui.components.MarkdownContent
 import com.harrisonog.lightmarkdownreader.ui.components.ReaderTopBar
+import com.harrisonog.lightmarkdownreader.util.TimeFormatter
 import com.harrisonog.lightmarkdownreader.viewmodel.ErrorType
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderUiState
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
@@ -29,9 +46,11 @@ fun ReaderScreen(
     viewModel: ReaderViewModel = viewModel(),
     onPickFile: () -> Unit,
     onShare: () -> Unit = {},
-    onClose: () -> Unit = {}
+    onClose: () -> Unit = {},
+    onRecentFileClick: (Uri) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val recentFiles by viewModel.recentFiles.collectAsState()
 
     Scaffold(
         topBar = {
@@ -49,7 +68,9 @@ fun ReaderScreen(
     ) { padding ->
         when (val state = uiState) {
             is ReaderUiState.Empty -> EmptyState(
+                recentFiles = recentFiles,
                 onPickFile = onPickFile,
+                onRecentFileClick = onRecentFileClick,
                 modifier = Modifier.padding(padding)
             )
             is ReaderUiState.Loading -> LoadingState(
@@ -74,22 +95,107 @@ fun ReaderScreen(
 
 @Composable
 fun EmptyState(
+    recentFiles: List<RecentFile>,
     onPickFile: () -> Unit,
+    onRecentFileClick: (Uri) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    val context = LocalContext.current
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(R.string.no_file_opened),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            Button(onClick = onPickFile) {
-                Text(stringResource(R.string.open_markdown_file))
+        // Recent files section
+        if (recentFiles.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = stringResource(R.string.recently_read),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                ) {
+                    items(recentFiles) { recentFile ->
+                        RecentFileItem(
+                            recentFile = recentFile,
+                            onClick = { onRecentFileClick(Uri.parse(recentFile.uri)) },
+                            context = context
+                        )
+                        if (recentFile != recentFiles.last()) {
+                            HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
+                        }
+                    }
+                }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        } else {
+            // Show centered message when no recent files
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_file_opened),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+        }
+
+        // Open file button at bottom
+        Button(
+            onClick = onPickFile,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.open_markdown_file))
+        }
+    }
+}
+
+@Composable
+fun RecentFileItem(
+    recentFile: RecentFile,
+    onClick: () -> Unit,
+    context: android.content.Context,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Description,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 16.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = recentFile.fileName,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = TimeFormatter.formatRelativeTime(context, recentFile.lastOpenedTimestamp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
