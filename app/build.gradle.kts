@@ -56,6 +56,9 @@ dependencies {
         exclude(group = "org.jetbrains", module = "annotations-java5")
     }
 
+    // Gson for JSON serialization
+    implementation(libs.gson)
+
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
