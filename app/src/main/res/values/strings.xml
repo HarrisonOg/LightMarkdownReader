@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">LightMarkdownReader</string>
+    <string name="markdown_reader">Markdown Reader</string>
+    <string name="open_file">Open file</string>
+    <string name="share">Share</string>
+    <string name="markdown_content_placeholder">Markdown content will be rendered here</string>
+    <string name="no_file_opened">No file opened</string>
+    <string name="open_markdown_file">Open Markdown File</string>
+    <string name="error_format">Error: %s</string>
+    <string name="try_another_file">Try Another File</string>
 </resources>
