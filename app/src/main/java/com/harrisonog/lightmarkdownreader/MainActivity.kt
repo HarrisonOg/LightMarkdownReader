@@ -35,9 +35,6 @@ class MainActivity : ComponentActivity() {
             // Save the current file URI for sharing
             currentFileUri = it
 
-            // Save the last opened file URI
-            saveLastOpenedFile(it)
-
             // Load the file
             viewModel.loadFile(it, fileRepository, recentFilesRepository)
         }
@@ -62,10 +59,16 @@ class MainActivity : ComponentActivity() {
                     },
                     onClose = {
                         viewModel.closeFile()
+                    },
+                    onRecentFileClick = { uri ->
+                        openRecentFile(uri)
                     }
                 )
             }
         }
+
+        // Load recent files list
+        viewModel.loadRecentFiles(recentFilesRepository)
 
         // Load last opened file if available
         loadLastOpenedFile()
@@ -73,6 +76,24 @@ class MainActivity : ComponentActivity() {
 
     private fun openFilePicker() {
         openDocumentLauncher.launch(arrayOf("text/markdown", "text/plain", "*/*"))
+    }
+
+    private fun openRecentFile(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                // Check if we still have permission to access the file
+                contentResolver.openInputStream(uri)?.close()
+
+                // Save the current file URI for sharing
+                currentFileUri = uri
+
+                // Load the file
+                viewModel.loadFile(uri, fileRepository, recentFilesRepository)
+            } catch (e: Exception) {
+                // Permission lost or file no longer exists, remove from recent files
+                viewModel.removeRecentFile(uri, recentFilesRepository)
+            }
+        }
     }
 
     private fun shareCurrentFile() {
@@ -86,17 +107,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun saveLastOpenedFile(uri: Uri) {
-        val prefs = getSharedPreferences("markdown_reader_prefs", MODE_PRIVATE)
-        prefs.edit().putString("last_opened_file", uri.toString()).apply()
-    }
-
     private fun loadLastOpenedFile() {
-        val prefs = getSharedPreferences("markdown_reader_prefs", MODE_PRIVATE)
-        val lastFileUri = prefs.getString("last_opened_file", null)
+        // Get the most recent file from the recent files repository
+        val recentFiles = recentFilesRepository.getRecentFiles()
 
-        lastFileUri?.let { uriString ->
-            val uri = Uri.parse(uriString)
+        if (recentFiles.isNotEmpty()) {
+            val mostRecentFile = recentFiles.first()
+            val uri = Uri.parse(mostRecentFile.uri)
+
             // Check if we still have permission to access the file
             lifecycleScope.launch {
                 try {
@@ -104,8 +122,8 @@ class MainActivity : ComponentActivity() {
                     currentFileUri = uri
                     viewModel.loadFile(uri, fileRepository, recentFilesRepository)
                 } catch (e: Exception) {
-                    // Permission lost or file no longer exists, clear the preference
-                    prefs.edit().remove("last_opened_file").apply()
+                    // Permission lost or file no longer exists, it will be removed by ViewModel
+                    viewModel.removeRecentFile(uri, recentFilesRepository)
                 }
             }
         }
