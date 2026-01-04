@@ -78,6 +78,39 @@ class RecentFilesRepository(private val context: Context) {
     }
 
     /**
+     * Validate all recent files and remove those that are no longer accessible.
+     * Returns only the valid, accessible files.
+     */
+    fun validateAndCleanupRecentFiles(): List<RecentFile> {
+        val currentFiles = getRecentFiles()
+        val validFiles = currentFiles.filter { recentFile ->
+            isFileAccessible(Uri.parse(recentFile.uri))
+        }
+
+        // If any files were removed, update SharedPreferences
+        if (validFiles.size != currentFiles.size) {
+            saveRecentFiles(validFiles)
+        }
+
+        return validFiles
+    }
+
+    /**
+     * Check if a file URI is still accessible
+     */
+    private fun isFileAccessible(uri: Uri): Boolean {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                // Just opening and closing is enough to verify accessibility
+                true
+            } ?: false
+        } catch (e: Exception) {
+            // Any exception means the file is not accessible
+            false
+        }
+    }
+
+    /**
      * Save the recent files list to SharedPreferences
      */
     private fun saveRecentFiles(files: List<RecentFile>) {

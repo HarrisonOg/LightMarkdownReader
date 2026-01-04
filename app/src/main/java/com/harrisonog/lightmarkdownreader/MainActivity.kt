@@ -108,8 +108,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadLastOpenedFile() {
-        // Get the most recent file from the recent files repository
-        val recentFiles = recentFilesRepository.getRecentFiles()
+        // Get the most recent file from the recent files repository (validated)
+        val recentFiles = recentFilesRepository.validateAndCleanupRecentFiles()
 
         if (recentFiles.isNotEmpty()) {
             val mostRecentFile = recentFiles.first()

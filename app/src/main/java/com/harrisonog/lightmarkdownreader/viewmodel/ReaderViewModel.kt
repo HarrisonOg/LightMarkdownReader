@@ -56,7 +56,8 @@ class ReaderViewModel : ViewModel() {
 
     fun loadRecentFiles(recentFilesRepository: RecentFilesRepository) {
         viewModelScope.launch {
-            _recentFiles.value = recentFilesRepository.getRecentFiles()
+            // Validate and cleanup recent files before displaying
+            _recentFiles.value = recentFilesRepository.validateAndCleanupRecentFiles()
         }
     }
 
