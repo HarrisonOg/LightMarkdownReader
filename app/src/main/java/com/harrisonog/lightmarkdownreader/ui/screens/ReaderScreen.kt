@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harrisonog.lightmarkdownreader.R
 import com.harrisonog.lightmarkdownreader.ui.components.MarkdownContent
 import com.harrisonog.lightmarkdownreader.ui.components.ReaderTopBar
+import com.harrisonog.lightmarkdownreader.viewmodel.ErrorType
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderUiState
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
 
@@ -57,6 +58,7 @@ fun ReaderScreen(
                     .padding(horizontal = 16.dp)
             )
             is ReaderUiState.Error -> ErrorState(
+                errorType = state.errorType,
                 message = state.message,
                 onPickFile = onPickFile,
                 modifier = Modifier.padding(padding)
@@ -101,17 +103,29 @@ fun LoadingState(
 
 @Composable
 fun ErrorState(
+    errorType: ErrorType,
     message: String,
     onPickFile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val errorMessage = when (errorType) {
+        ErrorType.FILE_NOT_FOUND -> stringResource(R.string.error_file_not_found)
+        ErrorType.PERMISSION_DENIED -> stringResource(R.string.error_permission_denied)
+        ErrorType.FILE_TOO_LARGE -> stringResource(R.string.error_file_too_large)
+        ErrorType.COULD_NOT_OPEN -> stringResource(R.string.error_could_not_open)
+        ErrorType.UNKNOWN -> stringResource(R.string.error_unknown)
+    }
+
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        ) {
             Text(
-                text = stringResource(R.string.error_format, message),
+                text = errorMessage,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(bottom = 16.dp)

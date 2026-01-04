@@ -7,4 +7,9 @@
     <string name="open_markdown_file">Open Markdown File</string>
     <string name="error_format">Error: %s</string>
     <string name="try_another_file">Try Another File</string>
+    <string name="error_file_not_found">File not found or no longer accessible</string>
+    <string name="error_permission_denied">Permission denied to read this file</string>
+    <string name="error_file_too_large">File is too large to open (max 10MB)</string>
+    <string name="error_could_not_open">Could not open file</string>
+    <string name="error_unknown">An unknown error occurred</string>
 </resources>
