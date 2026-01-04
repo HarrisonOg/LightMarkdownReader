@@ -27,7 +27,8 @@ import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
 @Composable
 fun ReaderScreen(
     viewModel: ReaderViewModel = viewModel(),
-    onPickFile: () -> Unit
+    onPickFile: () -> Unit,
+    onShare: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -37,7 +38,7 @@ fun ReaderScreen(
                 title = (uiState as? ReaderUiState.Success)?.fileName ?: stringResource(R.string.markdown_reader),
                 onOpenFile = onPickFile,
                 onShare = if (uiState is ReaderUiState.Success) {
-                    { /* Share logic will be implemented later */ }
+                    onShare
                 } else null
             )
         }

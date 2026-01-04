@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private val viewModel: ReaderViewModel by viewModels()
     private lateinit var fileRepository: FileRepository
+    private var currentFileUri: Uri? = null
 
     private val openDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -28,6 +29,9 @@ class MainActivity : ComponentActivity() {
                 it,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
+
+            // Save the current file URI for sharing
+            currentFileUri = it
 
             // Save the last opened file URI
             saveLastOpenedFile(it)
@@ -49,6 +53,9 @@ class MainActivity : ComponentActivity() {
                     viewModel = viewModel,
                     onPickFile = {
                         openFilePicker()
+                    },
+                    onShare = {
+                        shareCurrentFile()
                     }
                 )
             }
@@ -60,6 +67,17 @@ class MainActivity : ComponentActivity() {
 
     private fun openFilePicker() {
         openDocumentLauncher.launch(arrayOf("text/markdown", "text/plain", "*/*"))
+    }
+
+    private fun shareCurrentFile() {
+        currentFileUri?.let { uri ->
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(shareIntent, null))
+        }
     }
 
     private fun saveLastOpenedFile(uri: Uri) {
@@ -77,6 +95,7 @@ class MainActivity : ComponentActivity() {
             lifecycleScope.launch {
                 try {
                     contentResolver.openInputStream(uri)?.close()
+                    currentFileUri = uri
                     viewModel.loadFile(uri, fileRepository)
                 } catch (e: Exception) {
                     // Permission lost or file no longer exists, clear the preference
