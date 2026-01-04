@@ -10,6 +10,7 @@ class RecentFilesRepository(private val context: Context) {
     companion object {
         private const val PREFS_NAME = "markdown_reader_prefs"
         private const val KEY_RECENT_FILES = "recent_files_json"
+        private const val KEY_LAST_OPENED_FILE = "last_opened_file" // Legacy key
         private const val MAX_RECENT_FILES = 6
     }
 
@@ -75,6 +76,33 @@ class RecentFilesRepository(private val context: Context) {
      */
     fun clearRecentFiles() {
         prefs.edit().remove(KEY_RECENT_FILES).apply()
+    }
+
+    /**
+     * Migrate from old "last_opened_file" format to new recent files format.
+     * This should be called once on app startup to handle existing users.
+     */
+    fun migrateFromLegacyFormat() {
+        // Check if old key exists
+        val legacyUri = prefs.getString(KEY_LAST_OPENED_FILE, null)
+
+        if (legacyUri != null) {
+            // Only migrate if we can access the file
+            val uri = Uri.parse(legacyUri)
+            if (isFileAccessible(uri)) {
+                // Extract filename from URI
+                val fileName = uri.lastPathSegment ?: "document.md"
+
+                // Add to recent files (only if recent files is currently empty)
+                val currentFiles = getRecentFiles()
+                if (currentFiles.isEmpty()) {
+                    addRecentFile(uri, fileName)
+                }
+            }
+
+            // Remove the old key regardless of whether migration succeeded
+            prefs.edit().remove(KEY_LAST_OPENED_FILE).apply()
+        }
     }
 
     /**

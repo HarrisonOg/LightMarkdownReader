@@ -47,6 +47,9 @@ class MainActivity : ComponentActivity() {
         fileRepository = FileRepository(applicationContext)
         recentFilesRepository = RecentFilesRepository(applicationContext)
 
+        // Migrate from old "last_opened_file" format if needed
+        recentFilesRepository.migrateFromLegacyFormat()
+
         setContent {
             LightMarkdownReaderTheme {
                 ReaderScreen(
