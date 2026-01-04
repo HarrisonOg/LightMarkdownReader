@@ -8,6 +8,8 @@ import com.harrisonog.lightmarkdownreader.data.FileNotOpenableException
 import com.harrisonog.lightmarkdownreader.data.FilePermissionException
 import com.harrisonog.lightmarkdownreader.data.FileRepository
 import com.harrisonog.lightmarkdownreader.data.FileTooLargeException
+import com.harrisonog.lightmarkdownreader.data.RecentFile
+import com.harrisonog.lightmarkdownreader.data.RecentFilesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,16 +19,24 @@ class ReaderViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<ReaderUiState>(ReaderUiState.Empty)
     val uiState: StateFlow<ReaderUiState> = _uiState.asStateFlow()
 
-    fun loadFile(uri: Uri, repository: FileRepository) {
+    private val _recentFiles = MutableStateFlow<List<RecentFile>>(emptyList())
+    val recentFiles: StateFlow<List<RecentFile>> = _recentFiles.asStateFlow()
+
+    fun loadFile(uri: Uri, fileRepository: FileRepository, recentFilesRepository: RecentFilesRepository) {
         viewModelScope.launch {
             _uiState.value = ReaderUiState.Loading
 
-            repository.readMarkdownFile(uri).fold(
+            fileRepository.readMarkdownFile(uri).fold(
                 onSuccess = { content ->
+                    val fileName = fileRepository.getFileName(uri)
                     _uiState.value = ReaderUiState.Success(
                         content = content,
-                        fileName = repository.getFileName(uri)
+                        fileName = fileName
                     )
+
+                    // Add to recent files after successful load
+                    recentFilesRepository.addRecentFile(uri, fileName)
+                    loadRecentFiles(recentFilesRepository)
                 },
                 onFailure = { error ->
                     _uiState.value = ReaderUiState.Error(
@@ -41,6 +51,19 @@ class ReaderViewModel : ViewModel() {
                     )
                 }
             )
+        }
+    }
+
+    fun loadRecentFiles(recentFilesRepository: RecentFilesRepository) {
+        viewModelScope.launch {
+            _recentFiles.value = recentFilesRepository.getRecentFiles()
+        }
+    }
+
+    fun removeRecentFile(uri: Uri, recentFilesRepository: RecentFilesRepository) {
+        viewModelScope.launch {
+            recentFilesRepository.removeRecentFile(uri)
+            loadRecentFiles(recentFilesRepository)
         }
     }
 

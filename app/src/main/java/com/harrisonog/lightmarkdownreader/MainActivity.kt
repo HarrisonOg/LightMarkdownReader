@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.harrisonog.lightmarkdownreader.data.FileRepository
+import com.harrisonog.lightmarkdownreader.data.RecentFilesRepository
 import com.harrisonog.lightmarkdownreader.ui.screens.ReaderScreen
 import com.harrisonog.lightmarkdownreader.ui.theme.LightMarkdownReaderTheme
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private val viewModel: ReaderViewModel by viewModels()
     private lateinit var fileRepository: FileRepository
+    private lateinit var recentFilesRepository: RecentFilesRepository
     private var currentFileUri: Uri? = null
 
     private val openDocumentLauncher = registerForActivityResult(
@@ -37,7 +39,7 @@ class MainActivity : ComponentActivity() {
             saveLastOpenedFile(it)
 
             // Load the file
-            viewModel.loadFile(it, fileRepository)
+            viewModel.loadFile(it, fileRepository, recentFilesRepository)
         }
     }
 
@@ -46,6 +48,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         fileRepository = FileRepository(applicationContext)
+        recentFilesRepository = RecentFilesRepository(applicationContext)
 
         setContent {
             LightMarkdownReaderTheme {
@@ -99,7 +102,7 @@ class MainActivity : ComponentActivity() {
                 try {
                     contentResolver.openInputStream(uri)?.close()
                     currentFileUri = uri
-                    viewModel.loadFile(uri, fileRepository)
+                    viewModel.loadFile(uri, fileRepository, recentFilesRepository)
                 } catch (e: Exception) {
                     // Permission lost or file no longer exists, clear the preference
                     prefs.edit().remove("last_opened_file").apply()
