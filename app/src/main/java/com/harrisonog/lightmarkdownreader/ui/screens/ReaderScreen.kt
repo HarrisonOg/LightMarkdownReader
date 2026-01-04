@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.harrisonog.lightmarkdownreader.R
+import com.harrisonog.lightmarkdownreader.ui.components.MarkdownContent
 import com.harrisonog.lightmarkdownreader.ui.components.ReaderTopBar
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderUiState
 import com.harrisonog.lightmarkdownreader.viewmodel.ReaderViewModel
@@ -48,17 +49,13 @@ fun ReaderScreen(
             is ReaderUiState.Loading -> LoadingState(
                 modifier = Modifier.padding(padding)
             )
-            is ReaderUiState.Success -> Box(
+            is ReaderUiState.Success -> MarkdownContent(
+                markdown = state.content,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-            ) {
-                // Placeholder for markdown content
-                Text(
-                    text = stringResource(R.string.markdown_content_placeholder),
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+                    .padding(horizontal = 16.dp)
+            )
             is ReaderUiState.Error -> ErrorState(
                 message = state.message,
                 onPickFile = onPickFile,
