@@ -18,7 +18,6 @@ import com.harrisonog.lightmarkdownreader.R
 @Composable
 fun ReaderTopBar(
     title: String,
-    onOpenFile: () -> Unit,
     onShare: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null
 ) {
@@ -38,9 +37,6 @@ fun ReaderTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onOpenFile) {
-                Icon(Icons.Default.FolderOpen, contentDescription = stringResource(R.string.open_file))
-            }
             if (onShare != null) {
                 IconButton(onClick = onShare) {
                     Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share))

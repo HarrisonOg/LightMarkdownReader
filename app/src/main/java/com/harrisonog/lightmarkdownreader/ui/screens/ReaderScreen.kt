@@ -1,6 +1,12 @@
 package com.harrisonog.lightmarkdownreader.ui.screens
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -109,7 +117,11 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Recent files section
-        if (recentFiles.isNotEmpty()) {
+        AnimatedVisibility(
+            visible = recentFiles.isNotEmpty(),
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,23 +134,40 @@ fun EmptyState(
                 )
 
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(recentFiles) { recentFile ->
+                    items(
+                        items = recentFiles,
+                        key = { it.uri }
+                    ) { recentFile ->
                         RecentFileItem(
                             recentFile = recentFile,
                             onClick = { onRecentFileClick(Uri.parse(recentFile.uri)) },
-                            context = context
+                            context = context,
+                            modifier = Modifier.animateItem(
+                                fadeInSpec = spring(),
+                                fadeOutSpec = spring(),
+                                placementSpec = spring()
+                            )
                         )
-                        if (recentFile != recentFiles.last()) {
-                            HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
-                        }
                     }
                 }
             }
+        }
 
+        AnimatedVisibility(
+            visible = recentFiles.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
             Spacer(modifier = Modifier.height(16.dp))
-        } else {
+        }
+
+        AnimatedVisibility(
+            visible = recentFiles.isEmpty(),
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
             // Show centered message when no recent files
             Box(
                 modifier = Modifier
@@ -170,32 +199,43 @@ fun RecentFileItem(
     context: android.content.Context,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Description,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 16.dp),
-            tint = MaterialTheme.colorScheme.primary
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp,
+            pressedElevation = 3.dp
         )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Description,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = recentFile.fileName,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = TimeFormatter.formatRelativeTime(context, recentFile.lastOpenedTimestamp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = recentFile.fileName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = TimeFormatter.formatRelativeTime(context, recentFile.lastOpenedTimestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
