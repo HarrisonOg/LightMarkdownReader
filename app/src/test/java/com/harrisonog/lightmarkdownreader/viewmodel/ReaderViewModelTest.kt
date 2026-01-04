@@ -28,6 +28,7 @@ class ReaderViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var viewModel: ReaderViewModel
     private lateinit var fileRepository: FileRepository
+    private lateinit var recentFilesRepository: com.harrisonog.lightmarkdownreader.data.RecentFilesRepository
     private lateinit var mockUri: Uri
 
     @Before
@@ -35,6 +36,7 @@ class ReaderViewModelTest {
         Dispatchers.setMain(testDispatcher)
         viewModel = ReaderViewModel()
         fileRepository = mockk(relaxed = true)
+        recentFilesRepository = mockk(relaxed = true)
         mockUri = mockk(relaxed = true)
     }
 
@@ -63,7 +65,7 @@ class ReaderViewModelTest {
             // Skip initial Empty state
             awaitItem()
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             // Should emit Loading
             val loadingState = awaitItem()
@@ -87,7 +89,7 @@ class ReaderViewModelTest {
             // Skip initial Empty state
             awaitItem()
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             // Should emit Loading
             val loadingState = awaitItem()
@@ -109,7 +111,7 @@ class ReaderViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Skip initial state
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             awaitItem() // Skip Loading
 
@@ -128,7 +130,7 @@ class ReaderViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Skip initial state
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             awaitItem() // Skip Loading
 
@@ -147,7 +149,7 @@ class ReaderViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Skip initial state
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             awaitItem() // Skip Loading
 
@@ -166,7 +168,7 @@ class ReaderViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Skip initial state
 
-            viewModel.loadFile(mockUri, fileRepository)
+            viewModel.loadFile(mockUri, fileRepository, recentFilesRepository)
 
             awaitItem() // Skip Loading
 
