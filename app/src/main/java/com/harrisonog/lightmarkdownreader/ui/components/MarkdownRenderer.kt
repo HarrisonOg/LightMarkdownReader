@@ -8,9 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import io.noties.markwon.Markwon
-import io.noties.markwon.syntax.Prism4jThemeDefault
-import io.noties.markwon.syntax.SyntaxHighlightPlugin
-import io.noties.prism4j.Prism4j
 
 @Composable
 fun MarkdownContent(
@@ -19,9 +16,7 @@ fun MarkdownContent(
 ) {
     val context = LocalContext.current
     val markwon = remember {
-        Markwon.builder(context)
-            .usePlugin(SyntaxHighlightPlugin.create(Prism4j(), Prism4jThemeDefault()))
-            .build()
+        Markwon.create(context)
     }
 
     AndroidView(

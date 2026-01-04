@@ -1,7 +1,7 @@
 package com.harrisonog.lightmarkdownreader.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,7 +30,7 @@ fun ReaderTopBar(
         },
         actions = {
             IconButton(onClick = onOpenFile) {
-                Icon(Icons.Default.Folder, contentDescription = stringResource(R.string.open_file))
+                Icon(Icons.Default.FolderOpen, contentDescription = stringResource(R.string.open_file))
             }
             if (onShare != null) {
                 IconButton(onClick = onShare) {

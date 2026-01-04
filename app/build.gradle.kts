@@ -49,10 +49,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     // Markwon for markdown rendering
-    implementation(libs.markwon.core)
-    implementation(libs.markwon.syntax.highlight)
+    implementation(libs.markwon.core) {
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
