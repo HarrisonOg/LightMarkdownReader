@@ -1,21 +1,66 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ProGuard rules for LightMarkdownReader
+# These rules ensure the app works correctly in release builds with R8 optimization
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for debugging crashes in production
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# ========================================
+# Gson (for RecentFilesRepository JSON serialization)
+# ========================================
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Keep data model classes used with Gson
+-keep class com.harrisonog.lightmarkdownreader.data.RecentFile { *; }
+-keep class com.harrisonog.lightmarkdownreader.data.MarkdownFile { *; }
+
+# Generic Gson rules
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# ========================================
+# Markwon library (markdown rendering)
+# ========================================
+-keep class io.noties.markwon.** { *; }
+-keep interface io.noties.markwon.** { *; }
+-dontwarn io.noties.markwon.**
+
+# ========================================
+# Kotlin
+# ========================================
+-keepclassmembers class kotlinx.** { *; }
+-dontwarn kotlinx.**
+
+# ========================================
+# Custom exceptions for proper error handling
+# ========================================
+-keep class com.harrisonog.lightmarkdownreader.data.*Exception { *; }
+
+# ========================================
+# Jetpack Compose
+# ========================================
+-dontwarn androidx.compose.**
+-keep class androidx.compose.** { *; }
+
+# Keep Compose compiler annotations
+-keepattributes RuntimeVisibleAnnotations
+-keep @androidx.compose.runtime.Composable class * { *; }
+-keep @androidx.compose.runtime.Stable class * { *; }
+
+# ========================================
+# Android components
+# ========================================
+# Keep all Activities, Services, and BroadcastReceivers
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+
+# ========================================
+# R8 optimization settings
+# ========================================
+# Allow aggressive optimization while preserving functionality
+-optimizationpasses 5
+-allowaccessmodification
