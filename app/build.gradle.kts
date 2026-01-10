@@ -16,6 +16,14 @@ android {
         versionName = "1.0.0"  // Semantic versioning
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Use vector drawables for backward compatibility
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    androidResources {
+        // Limit to English language only
+        localeFilters += listOf("en")
     }
 
     buildTypes {
@@ -50,7 +58,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
 
     // Markwon for markdown rendering
     implementation(libs.markwon.core) {

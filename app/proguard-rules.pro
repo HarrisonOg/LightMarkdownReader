@@ -1,5 +1,5 @@
-# ProGuard rules for LightMarkdownReader
-# These rules ensure the app works correctly in release builds with R8 optimization
+# ProGuard rules for LightMarkdownReader - Optimized for size
+# These rules ensure the app works correctly while allowing maximum shrinking
 
 # Keep line numbers for debugging crashes in production
 -keepattributes SourceFile,LineNumberTable
@@ -22,16 +22,21 @@
 }
 
 # ========================================
-# Markwon library (markdown rendering)
+# Markwon library - OPTIMIZED (was too broad before)
 # ========================================
--keep class io.noties.markwon.** { *; }
--keep interface io.noties.markwon.** { *; }
+# Only keep the core classes we actually use
+-keep class io.noties.markwon.Markwon { *; }
+-keep class io.noties.markwon.Markwon$Builder { *; }
+-keep class io.noties.markwon.core.** { *; }
+-keep interface io.noties.markwon.MarkwonPlugin { *; }
+
+# Allow R8 to remove unused Markwon features
 -dontwarn io.noties.markwon.**
 
 # ========================================
-# Kotlin
+# Kotlin - OPTIMIZED (was too broad before)
 # ========================================
--keepclassmembers class kotlinx.** { *; }
+# Let R8 handle Kotlin optimization - remove the broad keepclassmembers rule
 -dontwarn kotlinx.**
 
 # ========================================
@@ -40,12 +45,12 @@
 -keep class com.harrisonog.lightmarkdownreader.data.*Exception { *; }
 
 # ========================================
-# Jetpack Compose
+# Jetpack Compose - OPTIMIZED (removed broad keep rule)
 # ========================================
+# R8 handles Compose optimization well - we don't need to keep everything
 -dontwarn androidx.compose.**
--keep class androidx.compose.** { *; }
 
-# Keep Compose compiler annotations
+# Keep Compose compiler annotations (these are needed)
 -keepattributes RuntimeVisibleAnnotations
 -keep @androidx.compose.runtime.Composable class * { *; }
 -keep @androidx.compose.runtime.Stable class * { *; }
@@ -53,7 +58,7 @@
 # ========================================
 # Android components
 # ========================================
-# Keep all Activities, Services, and BroadcastReceivers
+# Keep MainActivity and other Android components
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Service
 -keep public class * extends android.content.BroadcastReceiver
@@ -61,6 +66,7 @@
 # ========================================
 # R8 optimization settings
 # ========================================
-# Allow aggressive optimization while preserving functionality
+# Allow aggressive optimization
 -optimizationpasses 5
 -allowaccessmodification
+-repackageclasses ''
