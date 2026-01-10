@@ -64,7 +64,6 @@ fun ReaderScreen(
         topBar = {
             ReaderTopBar(
                 title = (uiState as? ReaderUiState.Success)?.fileName ?: stringResource(R.string.markdown_reader),
-                onOpenFile = onPickFile,
                 onShare = if (uiState is ReaderUiState.Success) {
                     onShare
                 } else null,
