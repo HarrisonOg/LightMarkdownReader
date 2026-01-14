@@ -76,8 +76,10 @@ class MainActivity : ComponentActivity() {
         // Load recent files list
         viewModel.loadRecentFiles(recentFilesRepository)
 
-        // Load last opened file if available
-        loadLastOpenedFile()
+        // Load last opened file only on fresh app start (not on config changes)
+        if (savedInstanceState == null) {
+            loadLastOpenedFile()
+        }
     }
 
     private fun openFilePicker() {

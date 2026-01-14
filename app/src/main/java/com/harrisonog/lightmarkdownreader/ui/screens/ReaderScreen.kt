@@ -73,7 +73,7 @@ fun ReaderScreen(
         }
     ) { padding ->
         when (val state = uiState) {
-            is ReaderUiState.Empty -> EmptyState(
+            is ReaderUiState.Empty -> HomeState(
                 recentFiles = recentFiles,
                 onPickFile = onPickFile,
                 onRecentFileClick = onRecentFileClick,
@@ -101,7 +101,7 @@ fun ReaderScreen(
 }
 
 @Composable
-fun EmptyState(
+fun HomeState(
     recentFiles: List<RecentFile>,
     onPickFile: () -> Unit,
     onRecentFileClick: (Uri) -> Unit,
