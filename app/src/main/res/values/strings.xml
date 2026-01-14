@@ -13,7 +13,8 @@
     <string name="error_file_too_large">File is too large to open (max 10MB)</string>
     <string name="error_could_not_open">Could not open file</string>
     <string name="error_unknown">An unknown error occurred</string>
-    <string name="recently_read">Recently Read</string>
+    <string name="recently_read">Recent Files</string>
+    <string name="clear_history">Clear History</string>
     <string name="no_recent_files">No recently read files</string>
     <string name="time_just_now">Just now</string>
     <string name="time_minutes_ago">%d minutes ago</string>

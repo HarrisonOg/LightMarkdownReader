@@ -68,6 +68,13 @@ class ReaderViewModel : ViewModel() {
         }
     }
 
+    fun clearRecentFiles(recentFilesRepository: RecentFilesRepository) {
+        viewModelScope.launch {
+            recentFilesRepository.clearRecentFiles()
+            loadRecentFiles(recentFilesRepository)
+        }
+    }
+
     fun closeFile() {
         _uiState.value = ReaderUiState.Empty
     }

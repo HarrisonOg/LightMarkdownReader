@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
                     },
                     onRecentFileClick = { uri ->
                         openRecentFile(uri)
+                    },
+                    onClearRecentFiles = {
+                        viewModel.clearRecentFiles(recentFilesRepository)
                     }
                 )
             }

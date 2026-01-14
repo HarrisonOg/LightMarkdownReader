@@ -7,7 +7,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -54,7 +53,8 @@ fun ReaderScreen(
     onPickFile: () -> Unit,
     onShare: () -> Unit = {},
     onClose: () -> Unit = {},
-    onRecentFileClick: (Uri) -> Unit = {}
+    onRecentFileClick: (Uri) -> Unit = {},
+    onClearRecentFiles: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val recentFiles by viewModel.recentFiles.collectAsState()
@@ -77,6 +77,7 @@ fun ReaderScreen(
                 recentFiles = recentFiles,
                 onPickFile = onPickFile,
                 onRecentFileClick = onRecentFileClick,
+                onClearHistory = onClearRecentFiles,
                 modifier = Modifier.padding(padding)
             )
             is ReaderUiState.Loading -> LoadingState(
@@ -104,6 +105,7 @@ fun EmptyState(
     recentFiles: List<RecentFile>,
     onPickFile: () -> Unit,
     onRecentFileClick: (Uri) -> Unit,
+    onClearHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -125,11 +127,23 @@ fun EmptyState(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                Text(
-                    text = stringResource(R.string.recently_read),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.recently_read),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+                    TextButton(
+                        onClick = onClearHistory,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        Text(stringResource(R.string.clear_history))
+                    }
+                }
 
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
